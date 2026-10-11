@@ -1,0 +1,27 @@
+# SREP binaries (too large for Git)
+*.efi
+*.log
+*.cfg~
+*.bak
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Desktop.ini
+*.iso
+*.img
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
