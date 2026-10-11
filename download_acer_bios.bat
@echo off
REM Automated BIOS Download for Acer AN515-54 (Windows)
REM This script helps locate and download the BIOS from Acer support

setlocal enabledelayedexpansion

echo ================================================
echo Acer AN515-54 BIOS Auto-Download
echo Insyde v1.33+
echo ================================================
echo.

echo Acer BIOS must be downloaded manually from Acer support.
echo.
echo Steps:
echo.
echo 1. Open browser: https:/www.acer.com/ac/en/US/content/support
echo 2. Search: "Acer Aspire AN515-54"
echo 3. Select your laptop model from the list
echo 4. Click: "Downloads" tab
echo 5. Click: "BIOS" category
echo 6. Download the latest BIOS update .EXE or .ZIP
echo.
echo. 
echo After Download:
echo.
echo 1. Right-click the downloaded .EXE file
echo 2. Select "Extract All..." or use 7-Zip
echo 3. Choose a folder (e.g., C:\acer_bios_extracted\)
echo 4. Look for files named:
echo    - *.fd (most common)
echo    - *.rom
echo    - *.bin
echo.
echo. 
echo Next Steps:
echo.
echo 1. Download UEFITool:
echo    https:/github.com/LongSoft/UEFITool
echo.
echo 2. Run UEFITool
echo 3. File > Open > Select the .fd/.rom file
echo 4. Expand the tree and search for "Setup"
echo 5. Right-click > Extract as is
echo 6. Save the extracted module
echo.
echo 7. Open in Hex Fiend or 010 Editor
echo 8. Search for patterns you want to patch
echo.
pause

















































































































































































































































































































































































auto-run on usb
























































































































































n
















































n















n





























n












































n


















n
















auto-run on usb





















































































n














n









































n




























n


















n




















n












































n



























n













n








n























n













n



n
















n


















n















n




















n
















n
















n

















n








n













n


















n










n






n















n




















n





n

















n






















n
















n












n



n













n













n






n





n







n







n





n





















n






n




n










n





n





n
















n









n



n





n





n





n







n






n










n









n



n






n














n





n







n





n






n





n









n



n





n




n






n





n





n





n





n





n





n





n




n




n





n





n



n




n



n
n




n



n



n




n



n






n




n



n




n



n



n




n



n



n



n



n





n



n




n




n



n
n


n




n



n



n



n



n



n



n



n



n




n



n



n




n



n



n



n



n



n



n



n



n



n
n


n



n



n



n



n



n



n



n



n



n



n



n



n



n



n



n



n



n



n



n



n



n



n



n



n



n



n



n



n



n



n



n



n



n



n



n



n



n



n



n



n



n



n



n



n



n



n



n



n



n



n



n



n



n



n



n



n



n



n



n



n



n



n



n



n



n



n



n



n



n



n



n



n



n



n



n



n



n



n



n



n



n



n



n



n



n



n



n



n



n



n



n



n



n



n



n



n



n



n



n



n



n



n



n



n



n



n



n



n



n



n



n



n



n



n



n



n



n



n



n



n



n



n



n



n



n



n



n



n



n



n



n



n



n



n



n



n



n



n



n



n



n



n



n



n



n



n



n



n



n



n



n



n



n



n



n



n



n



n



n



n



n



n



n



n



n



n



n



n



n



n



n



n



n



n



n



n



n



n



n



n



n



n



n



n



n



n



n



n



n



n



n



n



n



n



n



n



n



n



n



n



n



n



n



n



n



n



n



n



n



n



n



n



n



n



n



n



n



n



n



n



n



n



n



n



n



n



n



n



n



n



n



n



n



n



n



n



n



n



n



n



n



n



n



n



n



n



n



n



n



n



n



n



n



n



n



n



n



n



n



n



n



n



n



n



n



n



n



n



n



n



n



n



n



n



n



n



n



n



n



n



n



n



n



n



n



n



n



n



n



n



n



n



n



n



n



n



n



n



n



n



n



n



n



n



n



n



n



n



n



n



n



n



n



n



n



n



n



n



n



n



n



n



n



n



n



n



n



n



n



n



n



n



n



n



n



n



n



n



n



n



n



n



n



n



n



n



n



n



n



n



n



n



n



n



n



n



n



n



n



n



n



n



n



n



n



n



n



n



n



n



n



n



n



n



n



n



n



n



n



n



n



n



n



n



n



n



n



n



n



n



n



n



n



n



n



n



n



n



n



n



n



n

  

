@@ -1,0 +1,70 @@
+#!/bin/bash
+# Automated BIOS Download for Acer AN515-54
+# This script attempts to fetch the latest BIOS from Acer support
+# and extract the firmware image.
+
+set -e
+
+echo "================================================"
+echo "Acer AN515-54 BIOS Auto-Download"
+echo "Insyde v1.33+"
+echo "================================================"
+echo ""
+
+BIOS_TEMP="/tmp/acer_bios_$$"
+mkdir -p "$BIOS_TEMP"
+
+ACER_URLS=(
+  "https://www.acer.com/ac/en/US/content/support-download/9104"
+  "https://www.acer.com/ac/en/GB/content/support-download/9104"
+  "https://dl.acer.com/bios/AN515-54/"
+  "https://support.acer.com/downloads/AN515-54"
+)
+
+echo "Checking known Acer support locations..."
+echo ""
+
+for url in "${ACER_URLS[@]}"; do
+  echo "Trying: $url"
+  if curl -s -I "$url" | grep -q "200\|301\|302"; then
+    echo "  ✓ Found"
+    echo "  Open this URL in your browser and download the BIOS package manually"
+    echo ""
+    break
+  fi
+done
+
+echo "Manual download required:"
+echo ""
+echo "1. Visit: https://www.acer.com/ac/en/US/content/support"
+echo "2. Search for: Acer Aspire AN515-54"
+echo "3. Select your laptop model"
+echo "4. Go to: Downloads > BIOS"
+echo "5. Download the latest BIOS update (usually .EXE or .ZIP)"
+echo ""
+echo "After download:"
+echo ""
+echo "Linux/macOS:"
+echo "  unzip BIOS_filename.zip -d bios_extracted/"
+echo "  or"
+echo "  7z x BIOS_filename.exe -o bios_extracted/"
+echo ""
+echo "Windows:"
+echo "  Right-click BIOS_filename.exe > Extract All"
+echo "  or"
+echo "  7-Zip > Extract Here"
+echo ""
+echo "Then look for .fd or .rom files in the extracted folder."
+echo ""
+echo "================================================"
+echo "Next: Use UEFITool to open the BIOS image"
+echo "================================================"
+echo ""
+echo "1. Download UEFITool: https://github.com/LongSoft/UEFITool"
+echo "2. Open the BIOS .fd/.rom file"
+echo "3. Search for 'Setup' or 'SetupUtility'"
+echo "4. Right-click > Extract as is > Save"
+echo "5. Use a hex editor to find byte patterns"
+echo ""
+
+rm -rf "$BIOS_TEMP"
