@@ -1,0 +1,77 @@
+@echo off
+REM Acer AN515-54 SREP Bootable USB Preparation Script (Windows)
+REM Usage: prepare_usb.bat [drive-letter]
+
+setlocal enabledelayedexpansion
+
+set USB_DRIVE=%~1
+
+if "%USB_DRIVE%"=="" (
+    echo Detecting removable USB drives...
+    for /f "skip=1 tokens=1" %%D in ('wmic logicaldisk where drivetype^=2 get deviceid 2^>nul') do (
+        set USB_DRIVE=%%D
+        goto :found
+    )
+    :found
+)
+
+if "%USB_DRIVE%"=="" (
+    echo No removable USB drive detected.
+    echo Example: prepare_usb.bat D:
+    exit /b 1
+)
+
+echo ================================================
+echo SREP Bootable USB Preparation Tool
+echo Acer AN515-54 GTX1650 i7
+echo ================================================
+echo.
+echo Target USB drive: %USB_DRIVE%
+echo WARNING: This will ERASE all data on %USB_DRIVE%
+set /p CONFIRM="Type 'yes' to continue: "
+if /i not "%CONFIRM%"=="yes" (
+    echo Aborted.
+    exit /b 0
+)
+
+if not exist "SREP.efi" (
+    echo SREP.efi was not found in the current folder.
+    echo Download it first from:
+    echo https://github.com/Maxinator500/SmokelessRuntimeEFIPatcher-RUS/releases
+    exit /b 1
+)
+
+echo.
+echo [1/4] Formatting USB to FAT32...
+format %USB_DRIVE% /FS:FAT32 /Q /Y
+if errorlevel 1 (
+    echo Formatting failed. Check that the drive is valid and you are running as Administrator.
+    exit /b 1
+)
+
+echo [2/4] Creating EFI boot folder...
+mkdir %USB_DRIVE%\EFI\BOOT
+
+if exist "BOOTX64.efi" (
+    copy "BOOTX64.efi" "%USB_DRIVE%\EFI\BOOT\BOOTX64.efi"
+)
+
+copy "SREP.efi" "%USB_DRIVE%\EFI\BOOT\SREP.efi"
+copy "startup.nsh" "%USB_DRIVE%\startup.nsh"
+copy "SREP_Acer_AN51554.cfg" "%USB_DRIVE%\SREP_Acer_AN51554.cfg"
+copy "SREP_LOG.cfg" "%USB_DRIVE%\SREP_LOG.cfg"
+copy "SREP_ENG_LOG.cfg" "%USB_DRIVE%\SREP_ENG_LOG.cfg"
+copy "README.txt" "%USB_DRIVE%\README.txt"
+
+echo.
+echo [3/4] Verifying files...
+dir %USB_DRIVE%\EFI\BOOT
+dir %USB_DRIVE%\
+
+echo.
+echo [4/4] USB creation complete.
+echo.
+echo Boot your Acer AN515-54 with the USB inserted.
+echo Set Boot Mode to UEFI and disable Secure Boot in BIOS before booting.
+echo.
+exit /b 0

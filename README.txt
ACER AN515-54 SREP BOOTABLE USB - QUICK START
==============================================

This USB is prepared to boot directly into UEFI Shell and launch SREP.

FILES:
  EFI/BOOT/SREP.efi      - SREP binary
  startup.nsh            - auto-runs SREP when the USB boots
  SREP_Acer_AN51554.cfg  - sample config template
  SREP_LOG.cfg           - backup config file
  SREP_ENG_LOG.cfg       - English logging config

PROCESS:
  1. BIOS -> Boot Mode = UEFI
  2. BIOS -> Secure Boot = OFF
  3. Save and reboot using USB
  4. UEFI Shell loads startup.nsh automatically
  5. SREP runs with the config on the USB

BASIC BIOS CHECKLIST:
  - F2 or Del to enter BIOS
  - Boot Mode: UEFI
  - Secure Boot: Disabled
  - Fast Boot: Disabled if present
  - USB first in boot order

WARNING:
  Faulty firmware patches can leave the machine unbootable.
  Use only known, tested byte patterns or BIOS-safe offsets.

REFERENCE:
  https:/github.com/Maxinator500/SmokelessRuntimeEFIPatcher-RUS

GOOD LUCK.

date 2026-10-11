@@ -1,0 +1,36 @@
+# SREP configuration template for Acer AN515-54 GTX1650 i7
+# Use this as a starting point only. Replace placeholders with your BIOS values.
+# The actual patch values depend on your exact firmware revision.
+
+# Example: load the setup module so the patcher can operate on UEFI runtime data
+Op Loaded
+SetupUtility
+
+# Example: patch via memory offset (safer if exact offset is known)
+# Op FastestPatch
+# Offset
+# 0x1234
+# AABBCCDD
+
+# Example: patch by pattern (works when offset moves between BIOS builds)
+# Op FastPatch
+# Pattern
+# FFFF....AABBCCDD
+# FFFF0000EEFF0011
+
+# Example: regex patch
+# Op Patch
+# Pattern
+# 00....0011
+# 00AA0000BB
+
+# Example: load a specific GUID and patch it after discovery
+# Op LoadGUIDandSavePE
+# A1B2C3D4-E5F6-1234-5678-9ABCDEF01234
+# Op FastestPatch
+# Offset
+# 0x2000
+# 11223344
+
+# End of config
+Op End

@@ -1,0 +1,164 @@
+# Acer AN515-54 GTX1650 i7 - SREP Bootable USB Setup
+
+This repo prepares a bootable UEFI USB drive for the Acer AN515-54 that automatically launches the Smokeless Runtime EFI Patcher (SREP) when the machine boots.
+
+The project is built around the upstream SREP project:
+https://github.com/Maxinator500/SmokelessRuntimeEFIPatcher-RUS
+
+## Why this repo exists
+
+The upstream SREP project is powerful but it requires manual setup and a firmware-friendly config. This repo automates the USB boot workflow and gives you a sane starting point for Acer AN515-54 use.
+
+It includes:
+- USB creation scripts
+- UEFI `startup.nsh` auto-launch
+- a sample SREP config file named for Acer AN515-54
+- BIOS boot checklist
+- safety guidance
+
+## Important warning
+
+SREP can modify firmware at runtime. A bad patch can leave a machine unbootable.
+
+- Keep a BIOS backup before trying patches
+- Start with logging and minimal config changes
+- Use the included sample config only as a template
+- Disable Secure Boot before booting from USB
+- Do not flash random unknown byte patterns into your BIOS
+
+## What you need
+
+- A USB stick (8GB+ recommended)
+- Windows, Linux, or macOS
+- The actual `SREP.efi` binary from the upstream repo
+- An Acer AN515-54 laptop
+
+## Quick start
+
+### 1) Download SREP
+
+You can either:
+- download the official release from the upstream repo, or
+- run the included download script
+
+Linux/macOS:
+```bash
+bash download_srep.sh
+```
+
+Windows:
+```powershell
+download_srep.bat
+```
+
+This will try to fetch the latest `SREP.efi` from GitHub releases.
+
+### 2) Create the bootable USB
+
+Linux/macOS:
+```bash
+bash prepare_usb.sh
+```
+
+Windows:
+```powershell
+prepare_usb.bat
+```
+
+If you pass a device path manually, the script accepts it too:
+```bash
+bash prepare_usb.sh /dev/sdb
+```
+
+### 3) Boot the USB on Acer AN515-54
+
+1. Insert USB
+2. Power on and press F2 or Del during boot
+3. Set BIOS Boot Mode to UEFI
+4. Disable Secure Boot
+5. Save BIOS changes
+6. Boot from USB (F12 / Esc depending on model)
+7. The UEFI shell should auto-execute `startup.nsh`
+8. `startup.nsh` will look for `SREP.efi` and the config file
+
+## Included files
+
+- `prepare_usb.sh` — Linux/macOS USB builder
+- `prepare_usb.bat` — Windows USB builder
+- `startup.nsh` — auto-run script for UEFI shell
+- `SREP_Acer_AN51554.cfg` — sample config template
+- `SREP_LOG.cfg` — legacy config placeholder
+- `SREP_ENG_LOG.cfg` — English version placeholder
+- `download_srep.sh` — GitHub release downloader
+- `download_srep.bat` — Windows downloader
+- `README.md` — main documentation
+- `README.txt` — quick USB instructions
+
+## Auto-run behavior
+
+The UEFI shell script `startup.nsh` does the following:
+- checks common USB mount locations like `fs0:` and `fs1:`
+- looks for `EFI/BOOT/SREP.efi`
+- looks for `SREP_Acer_AN51554.cfg` or `SREP_LOG.cfg`
+- starts the EFI binary automatically
+- leaves the shell open so logs can be inspected
+
+## Recommended Acer AN515-54 BIOS steps
+
+Before booting the USB:
+- Enter BIOS with F2 or Del
+- Set Boot Mode to UEFI
+- Disable Secure Boot
+- Disable Fast Boot if present
+- Ensure USB is above internal drives in boot order
+- Save changes and reboot
+
+## Config usage
+
+The sample config file is intentionally a safe template.
+
+Edit `SREP_Acer_AN51554.cfg` before using it in production. Replace placeholder commands with actual firmware patterns, GUIDs, and offsets from your BIOS image.
+
+Example structure:
+```ini
+Op Loaded
+SetupUtility
+
+Op FastestPatch
+Offset
+0x1234
+AABBCCDD
+
+Op End
+```
+
+Use the upstream project docs for command syntax:
+https://github.com/Maxinator500/SmokelessRuntimeEFIPatcher-RUS/blob/master/README.md
+
+## Recovery / rollback
+
+If a patch breaks booting:
+- power off and unplug AC
+- hold power button for 30 seconds
+- reinsert battery if accessible and CMOS reset if required
+- boot into BIOS recovery / Acer BIOS recovery mode
+
+## Safe workflow
+
+1. Download SREP
+2. Create USB
+3. Boot with logging enabled
+4. Confirm config loads and no errors appear
+5. Add one small patch at a time
+6. Review `SREP.log` after each run
+7. Only keep working patches
+
+## License
+
+This setup repo is provided as a convenience toolkit. It does not modify the upstream SREP project license.
+
+The upstream SREP project remains the canonical firmware patcher and should be referenced directly for exact command semantics.
+
+---
+
+If you want a version tailored to a specific Acer BIOS revision, upload the exact BIOS version or firmware package and I can help build a more precise config template.
